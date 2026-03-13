@@ -1,0 +1,414 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: #f5f1e8;
+}
+
+/* Font families cho các elements */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Màu sắc hài hòa với background library */
+:root {
+  --warm-cream: #f5f1e8;
+  --warm-beige: #e8e0d0;
+  --warm-yellow: #f4d03f;
+  --warm-gold: #d4af37;
+  --deep-brown: #3d2817;
+  --warm-brown: #5c4033;
+  --warm-orange: #d97706;
+  --deep-blue: #1e3a5f;
+  --warm-teal: #4a9b8e;
+}
+
+/* Custom Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes gradient-text {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-float {
+  animation: float linear infinite;
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.animate-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-text 3s ease infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+/* Carousel smooth transitions */
+.carousel-slide {
+  transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+.carousel-content {
+  transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+}
+
+/* Smooth button hover effects */
+button[aria-label*="slide"] {
+  will-change: transform, opacity;
+}
+
+button[aria-label*="slide"]:hover {
+  will-change: transform, opacity, box-shadow;
+}
+
+/* Optimize background image quality */
+section[class*="Banner"] {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure high quality background rendering */
+.bg-cover {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+}
+
+/* Responsive image sizing - chỉ thay đổi kích thước theo width */
+img {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Đảm bảo không có horizontal scroll */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+section, div {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ẩn scrollbar cho các section nhưng vẫn giữ khả năng cuộn */
+section {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+section::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Custom horizontal scrollbar for event sections */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Hover to show scrollbar */
+.hover\:scrollbar-show:hover {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #d4af37 transparent; /* thumb and track color for Firefox */
+}
+
+.hover\:scrollbar-show:hover::-webkit-scrollbar {
+  display: block;
+  height: 8px;
+}
+
+.hover\:scrollbar-show:hover::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.hover\:scrollbar-show:hover::-webkit-scrollbar-thumb {
+  background: #d4af37;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.hover\:scrollbar-show:hover::-webkit-scrollbar-thumb:hover {
+  background: #f4d03f;
+}
+
+/* Smooth scroll behavior */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Swipe/Drag scroll container */
+.scroll-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.scroll-container:active {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll snap for cards */
+.scroll-snap-card {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+/* Responsive event cards - prevent layout breakage on zoom */
+.event-card {
+  flex: 0 0 auto;
+  width: clamp(260px, 75vw, 380px);
+}
+
+@media (min-width: 480px) {
+  .event-card {
+    width: clamp(280px, 65vw, 380px);
+  }
+}
+
+@media (min-width: 640px) {
+  .event-card {
+    width: clamp(300px, 45vw, 380px);
+  }
+}
+
+@media (min-width: 768px) {
+  .event-card {
+    width: clamp(320px, 38vw, 380px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .event-card {
+    width: clamp(320px, 30vw, 380px);
+  }
+}
+
+@media (min-width: 1280px) {
+  .event-card {
+    width: clamp(320px, 23vw, 380px);
+  }
+}
+
+@media (min-width: 1536px) {
+  .event-card {
+    width: clamp(340px, 20vw, 380px);
+  }
+}
+
+/* Prevent text overflow in cards */
+.event-card h3,
+.event-card p,
+.event-card span {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Ensure images scale properly */
+.event-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Ẩn scrollbar cho các div containers */
+div[class*="overflow"] {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+div[class*="overflow"]::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Ẩn scrollbar cho Home div */
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Ẩn scrollbar cho tất cả div trong Home */
+.no-scrollbar div {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.no-scrollbar div::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Ẩn scrollbar cho RainbowKit ConnectButton dropdown */
+[data-rk] *,
+[data-rk] *::-webkit-scrollbar,
+div[role="dialog"] *,
+div[role="menu"] *,
+div[role="listbox"] * {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+[data-rk] *::-webkit-scrollbar,
+div[role="dialog"] *::-webkit-scrollbar,
+div[role="menu"] *::-webkit-scrollbar,
+div[role="listbox"] *::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Ẩn scrollbar cho tất cả dropdown và modal */
+[class*="rk-"] *,
+[class*="rk-"] *::-webkit-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+[class*="rk-"] *::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ẩn scrollbar cho RainbowKit dropdown menu */
+.rainbowkit-no-scrollbar *,
+.rainbowkit-no-scrollbar *::-webkit-scrollbar {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.rainbowkit-no-scrollbar *::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Target cụ thể cho RainbowKit modal và dropdown */
+div[data-rk],
+div[data-rk] > *,
+div[data-rk] > * > * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+div[data-rk]::-webkit-scrollbar,
+div[data-rk] > *::-webkit-scrollbar,
+div[data-rk] > * > *::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Đảm bảo RainbowKit overlay phủ toàn bộ màn hình */
+[data-rk],
+[data-rk] > div[role="dialog"],
+div[role="dialog"][data-rk],
+.rk-modal,
+[class*="rk-modal"],
+[class*="rk-overlay"] {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+}
+
+/* Overlay background phủ toàn màn hình */
+[data-rk] > div:first-child,
+[data-rk] > div[class*="overlay"],
+[data-rk] > div[class*="backdrop"] {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
