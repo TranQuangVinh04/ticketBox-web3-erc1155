@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique
+  name      String   
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // User bought tickets for which events (ERC1155 tokenId)
+  purchases     EventPurchase[]
+
+  @@map("users")
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  chainId   Int
+  name      String?
+  // ERC1155 tokenId representing this event's ticket
+  tokenId   BigInt
+  contractId String
+  contract  Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  purchases EventPurchase[]
+
+  // one event per (contract, tokenId)
+  @@unique([contractId, tokenId])
+  @@index([chainId])
+
+  @@map("events")
+}
+
+model Contract {
+  id        String   @id @default(uuid())
+  chainId   Int
+  address   String
+  createdAt DateTime @default(now())
+
+  events    Event[]
+
+  @@unique([chainId, address])
+  @@map("contracts")
+}
+
+// Join table: user bought tickets for which event (ERC1155 amount)
+model EventPurchase {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)      
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // prevent duplicate row; use quantity to represent 2-3-... tickets
+  @@unique([userId, eventId])
+  @@index([eventId])
+  @@map("event_purchases")
+}
+
+
+
