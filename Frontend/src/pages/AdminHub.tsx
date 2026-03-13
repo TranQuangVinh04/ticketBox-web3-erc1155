@@ -303,11 +303,11 @@ export default function AdminHub() {
                           <tr
                             key={ev.key}
                             className="border-b border-[#5c4033]/40 hover:bg-[#5c4033]/50 cursor-pointer"
-                            onClick={() =>
-                              navigate('/admin/analytics', {
-                                state: { highlightEventId: ev.sampleEventId },
-                              })
-                            }
+                            onClick={() => {
+                              // Chuyển sang tab "Thống kê & doanh thu" ngay trong AdminHub,
+                              // giữ nguyên route hiện tại, không điều hướng sang trang khác.
+                              setActiveSection('analytics')
+                            }}
                           >
                             <td className="py-1.5 px-2 text-[#e8e0d0]">
                               {ev.name}

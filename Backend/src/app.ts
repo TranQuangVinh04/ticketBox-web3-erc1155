@@ -6,8 +6,14 @@ import { ZodError } from "zod";
 import { authRouter } from "./routes/auth.r";
 import { meRouter } from "./routes/me.r";
 import { routerGetEvent } from "./routes/getEvent";
-  import { setPurchaseRouter } from "./routes/setPurchase";
-  export function createApp() {
+import { setPurchaseRouter } from "./routes/setPurchase";
+import { ticketsRouter } from "./routes/tickets.r";
+import { bellRouter } from "./routes/bell.r";
+import { adminRouter } from "./routes/admin.r";
+import { adminUsersRouter } from "./routes/adminUsers.r";
+import { adminActivityRouter } from "./routes/adminActivity.r";
+
+export function createApp() {
   const app = express();
 
   app.use(helmet());
@@ -20,11 +26,21 @@ import { routerGetEvent } from "./routes/getEvent";
   app.use(meRouter);
   app.use(routerGetEvent);
   app.use(setPurchaseRouter);
+  app.use(ticketsRouter);
+  app.use(bellRouter);
+  app.use(adminRouter);
+  app.use(adminUsersRouter);
+  app.use(adminActivityRouter);
 
   app.use("/api", authRouter);
   app.use("/api", meRouter);
   app.use("/api", routerGetEvent);
   app.use("/api", setPurchaseRouter);
+  app.use("/api", ticketsRouter);
+  app.use("/api", bellRouter);
+  app.use("/api", adminRouter);
+  app.use("/api", adminUsersRouter);
+  app.use("/api", adminActivityRouter);
 
   app.use((_req, res) => res.status(404).json({ ok: false, error: "NOT_FOUND" }));
 

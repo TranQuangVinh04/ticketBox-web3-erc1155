@@ -193,6 +193,7 @@ function AdminEventsContent({ embedded }: { embedded?: boolean }) {
 
   const groupedVisibleRows = useMemo(() => {
     const map = new Map<string, GroupedEventRow>()
+    
     for (const row of visibleRows) {
       const key = makeDisplayKey(row.slug, row.chainId, row.contractAddress)
       const current = map.get(key)
@@ -204,6 +205,7 @@ function AdminEventsContent({ embedded }: { embedded?: boolean }) {
         })
         continue
       }
+
 
       if (row.tokenId && !current.tokenIds.includes(row.tokenId)) {
         current.tokenIds.push(row.tokenId)

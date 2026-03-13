@@ -8,67 +8,155 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  walletAddress String   @unique
-  name      String   
-  lastLoginAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // User bought tickets for which events (ERC1155 tokenId)
-  purchases     EventPurchase[]
+  id                 String               @id @default(uuid())
+  walletAddress      String               @unique
+  lastLoginAt        DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  name               String
+  role               UserRole             @default(USER)
+  activity_logs      activity_logs[]
+  bell_notifications bell_notifications[]
+  purchases          EventPurchase[]
+  ticket_seats       ticket_seats[]
 
   @@map("users")
 }
 
 model Event {
-  id        String   @id @default(uuid())
-  chainId   Int
-  name      String?
-  // ERC1155 tokenId representing this event's ticket
-  tokenId   BigInt
-  contractId String
-  contract  Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String          @id @default(uuid())
+  chainId      Int
+  name         String?
+  tokenId      BigInt
+  contractId   String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  purchases    EventPurchase[]
+  contract     Contract        @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  ticket_seats ticket_seats[]
+  tickets      tickets[]
 
-  purchases EventPurchase[]
-
-  // one event per (contract, tokenId)
   @@unique([contractId, tokenId])
   @@index([chainId])
-
   @@map("events")
 }
 
 model Contract {
-  id        String   @id @default(uuid())
-  chainId   Int
-  address   String
-  createdAt DateTime @default(now())
-
-  events    Event[]
+  id             String           @id @default(uuid())
+  chainId        Int
+  address        String
+  createdAt      DateTime         @default(now())
+  event_displays event_displays[]
+  events         Event[]
 
   @@unique([chainId, address])
   @@map("contracts")
 }
 
-// Join table: user bought tickets for which event (ERC1155 amount)
 model EventPurchase {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)      
   eventId   String
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // prevent duplicate row; use quantity to represent 2-3-... tickets
   @@unique([userId, eventId])
   @@index([eventId])
   @@map("event_purchases")
 }
 
+model activity_logs {
+  id            String   @id
+  userId        String?
+  walletAddress String?
+  action        String
+  meta          Json?
+  ip            String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  users         User?    @relation(fields: [userId], references: [id])
 
+  @@index([userId, createdAt])
+}
 
+model bell_notifications {
+  id        String    @id
+  userId    String
+  kind      String    @default("checkin")
+  title     String
+  message   String
+  meta      Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  users     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt, createdAt])
+}
+
+model event_displays {
+  id              String    @id
+  slug            String
+  title           String
+  description     String    @default("")
+  bannerImage     String    @default("")
+  date            String    @default("")
+  location        String    @default("")
+  displayPrice    String    @default("")
+  featured        Boolean   @default(true)
+  bannerHighlight Boolean   @default(false)
+  highlightOrder  Int       @default(0)
+  chainId         Int
+  contractAddress String
+  defaultTokenId  String?
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime
+  contractId      String?
+  contracts       Contract? @relation(fields: [contractId], references: [id])
+
+  @@unique([chainId, contractAddress, slug])
+  @@index([bannerHighlight, highlightOrder])
+  @@index([chainId, contractAddress])
+}
+
+model ticket_seats {
+  id        String   @id
+  userId    String
+  eventId   String
+  tokenId   BigInt
+  seatCode  String
+  createdAt DateTime @default(now())
+  events    Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  users     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, seatCode])
+  @@index([userId, eventId])
+}
+
+model tickets {
+  id          String    @id
+  eventId     String
+  ownerWallet String
+  tokenId     BigInt
+  amount      Int       @default(1)
+  nonce       String
+  status      String    @default("PENDING")
+  checkedInAt DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  events      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([nonce])
+}
+
+enum UserRole {
+  USER
+  STAFF
+  OWNER
+}

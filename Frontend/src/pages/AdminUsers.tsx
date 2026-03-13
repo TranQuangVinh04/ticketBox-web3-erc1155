@@ -39,6 +39,78 @@ const ACTION_LABELS: Record<string, string> = {
   ADMIN_UPDATE_USER_ROLE: 'Admin: đổi role user',
 }
 
+function formatActivityDetails(item: ActivityItem): string {
+  const meta = (item.meta ?? {}) as any
+
+  switch (item.action) {
+    case 'AUTH_LOGIN': {
+      const wallet = item.walletAddress ? shortAddress(item.walletAddress) : 'Không rõ ví'
+      const purchaseCount = Array.isArray(meta.purchases) ? meta.purchases.length : 0
+      const purchaseText =
+        purchaseCount > 0 ? `Đang có ${purchaseCount} lần mua vé được ghi nhận.` : 'Chưa có lịch sử mua vé.'
+      return `Người dùng đăng nhập bằng ví ${wallet}. ${purchaseText}`
+    }
+
+    case 'PURCHASE_SET': {
+      const quantity = meta.quantity ?? 1
+      const seat = meta.seat ? `Ghế: ${meta.seat}.` : 'Ghế: chưa gán hoặc không áp dụng.'
+      const tokenInfo =
+        meta.tokenId != null ? `Token ID: ${String(meta.tokenId)}.` : 'Token ID: không rõ.'
+      const chainInfo =
+        meta.chainId != null && meta.contractAddress
+          ? `Hợp đồng: ${meta.contractAddress} (chain ${meta.chainId}).`
+          : ''
+      return `Người dùng mua ${quantity} vé cho một sự kiện. ${seat} ${tokenInfo} ${chainInfo}`.trim()
+    }
+
+    case 'TICKET_CHECKIN': {
+      const eventName = meta.eventName ?? meta.eventId ?? 'Sự kiện không rõ'
+      const ticketId = meta.ticketId ? `Mã vé: ${meta.ticketId}. ` : ''
+      const seat = meta.seat ? `Ghế: ${meta.seat}. ` : ''
+      const onchain =
+        meta.burnTxHash && typeof meta.burnTxHash === 'string'
+          ? `Đã burn on-chain, tx: ${meta.burnTxHash.slice(0, 12)}...`
+          : ''
+      return `Check-in thành công cho sự kiện "${eventName}". ${ticketId}${seat}${onchain}`.trim()
+    }
+
+    case 'ADMIN_UPSERT_EVENT_DISPLAY': {
+      const slug = meta.slug ?? 'không rõ'
+      const title = meta.title ?? meta.displayTitle ?? meta.eventTitle ?? ''
+      return `Admin chỉnh sửa cấu hình hiển thị của event (slug: ${slug}${
+        title ? `, tên: "${title}"` : ''
+      }).`
+    }
+
+    case 'ADMIN_DELETE_EVENT_DISPLAY': {
+      const slug = meta.slug ?? 'không rõ'
+      const title = meta.title ?? meta.displayTitle ?? meta.eventTitle ?? ''
+      return `Admin ẩn event khỏi banner (slug: ${slug}${title ? `, tên: "${title}"` : ''}).`
+    }
+
+    case 'ADMIN_RESTORE_EVENT_DISPLAY': {
+      const slug = meta.slug ?? 'không rõ'
+      const title = meta.title ?? meta.displayTitle ?? meta.eventTitle ?? ''
+      return `Admin khôi phục event lên banner (slug: ${slug}${title ? `, tên: "${title}"` : ''}).`
+    }
+
+    case 'ADMIN_UPDATE_USER_ROLE': {
+      const newRole: UserRole | undefined = meta.newRole
+      const roleLabel = newRole ? ROLE_LABELS[newRole] ?? newRole : 'không rõ'
+      const target = meta.targetUserId ?? 'không rõ ID user'
+      return `Admin đổi quyền của người dùng (ID: ${target}) sang role: ${roleLabel}.`
+    }
+
+    default: {
+      try {
+        return JSON.stringify(meta ?? {}, null, 2)
+      } catch {
+        return String(meta)
+      }
+    }
+  }
+}
+
 function formatDateTime(value: string) {
   const d = new Date(value)
   if (Number.isNaN(d.getTime())) return value
@@ -432,7 +504,7 @@ function AdminUsersContent({ embedded }: { embedded?: boolean }) {
                           </td>
                           <td className="py-2 px-2 text-[#e8e0d0]/85 max-w-[260px]">
                             <pre className="whitespace-pre-wrap break-all text-[11px] bg-black/20 rounded-md p-2 border border-[#5c4033]/60">
-                              {JSON.stringify(item.meta ?? {}, null, 2)}
+                              {formatActivityDetails(item)}
                             </pre>
                           </td>
                         </tr>

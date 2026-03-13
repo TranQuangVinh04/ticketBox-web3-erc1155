@@ -6,6 +6,7 @@ import { getPrisma } from "../../db/prisma";
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
 import { jsonSafe } from "../../utils/json";
+import { logActivity } from "../../utils/activityLog";
 const VerifyBodySchema = z.object({
     address: z.string().min(1).optional(),
     chainId: z.coerce.number().int().positive().optional(),
@@ -81,8 +82,20 @@ const VerifyBodySchema = z.object({
         
       });
   
-      
-    
+      await logActivity({
+        req,
+        userId: user.id,
+        walletAddress: user.walletAddress,
+        action: "AUTH_LOGIN",
+        meta: {
+          purchases: user.purchases?.map((p) => ({
+            id: p.id,
+            eventId: p.event?.id,
+            contractAddress: p.event?.contract?.address,
+            chainId: p.event?.contract?.chainId
+          }))
+        }
+      });
   
     const token = signAccessToken(recovered);
     return res.json({ ok: true, token, user: jsonSafe(user) });

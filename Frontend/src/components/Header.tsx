@@ -148,7 +148,14 @@ function SearchBar() {
       void searchEvents(keyword, 8)
         .then((rows) => {
           if (!cancelled) {
-            setResults(rows)
+            const byContract = new Map<string, EventSearchItem>()
+            for (const item of rows) {
+              const key = `${item.chainId ?? ''}:${(item.contractAddress || '').toLowerCase() || item.id}`
+              if (!byContract.has(key)) {
+                byContract.set(key, item)
+              }
+            }
+            setResults(Array.from(byContract.values()))
             setOpen(true)
           }
         })

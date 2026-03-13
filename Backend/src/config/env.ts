@@ -1,4 +1,10 @@
-import "dotenv/config";
+import path from "node:path";
+import { config } from "dotenv";
+
+// Luôn load .env từ thư mục gốc Backend (cùng cấp package.json), không phụ thuộc cwd
+const backendRoot = path.resolve(__dirname, "..", "..");
+config({ path: path.join(backendRoot, ".env") });
+
 import { z } from "zod";
 
 const EnvSchema = z.object({
@@ -16,7 +22,13 @@ const EnvSchema = z.object({
   DB_PASSWORD: z.string().optional(),
   DB_NAME: z.string().optional(),
   // "true" để bật SSL (thường dùng khi deploy); local thường để trống/false.
-  DB_SSL: z.string().optional()
+  DB_SSL: z.string().optional(),
+
+  // Ticketing / blockchain features
+  QR_SIGNING_SECRET: z.string().optional(),
+  CHAIN_RPC_URL: z.string().optional(),
+  ERC1155_CONTRACT_ADDRESS: z.string().optional(),
+  CHECKIN_BURNER_PRIVATE_KEY: z.string().optional()
 });
 
 export const env = EnvSchema.parse(process.env);
